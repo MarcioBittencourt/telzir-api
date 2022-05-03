@@ -1,0 +1,25 @@
+datasource db {
+  url      = env("DATABASE_URL")
+  provider = "postgresql"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model CallBudget {
+  id           Int     @id @default(autoincrement())
+  uuid         String  @unique @default(uuid())
+  source       String
+  target       String
+  duration     Int
+  amount       Decimal @db.Decimal(8, 2)
+  amountNoPlan Decimal @db.Decimal(8, 2)
+  plan         Plan
+}
+
+enum Plan {
+  FALEMAIS30
+  FALEMAIS60
+  FALEMAIS120
+}
