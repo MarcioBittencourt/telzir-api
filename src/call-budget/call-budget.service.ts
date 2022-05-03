@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { CallBudget, Prisma, Plan } from '@prisma/client';
-import { PrismaService } from 'src/shered/services/prisma.service';
+import { PrismaService } from '../shared/services/prisma.service';
 
 const TAX = 0.1;
 
@@ -25,7 +25,7 @@ export class CallBudgetService {
 
   async simulateBudget(
     data: Prisma.CallBudgetUncheckedCreateInput,
-  ): Promise<CallBudget> {
+  ): Promise<any> {
     const { cost, costNoPlan } = this.callCost(
       data.source,
       data.target,
@@ -36,7 +36,13 @@ export class CallBudgetService {
     );
     data.amount = cost;
     data.amountNoPlan = costNoPlan;
-    return this.prisma.callBudget.create({ data });
+    const response = await this.prisma.callBudget.create({ data });
+    const { amount, amountNoPlan, ...rest } = response;
+    return {
+      amount: amount.toNumber(),
+      amountNoPlan: amountNoPlan.toNumber(),
+      ...rest,
+    };
   }
 
   private callCost = (
